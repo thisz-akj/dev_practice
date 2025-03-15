@@ -1,6 +1,6 @@
 import pickle
 import numpy as np
-from flask import Flask, request, render_template
+from flask import Flask, request, jsonify, render_template
 
 # Load the trained model
 with open("regmodel.pkl", "rb") as file:
@@ -25,6 +25,24 @@ def home():
             prediction = "Invalid input! Please enter numeric values."
 
     return render_template("home.html", prediction=prediction)
+
+# API endpoint for making predictions
+@app.route("/predict", methods=["POST"])
+def predict():
+    try:
+        # Get JSON request data
+        data = request.get_json()
+
+        # Extract features
+        features = np.array(data["features"]).reshape(1, -1)
+
+        # Make prediction
+        prediction = model.predict(features)[0]
+
+        return jsonify({"prediction": prediction})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
     app.run(debug=True)
