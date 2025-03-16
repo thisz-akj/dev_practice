@@ -1,31 +1,16 @@
-# Your workflow name.
 name: Deploy to Render
 
-# Run workflow on every push to the main branch.
 on:
   push:
     branches: [main]
 
-# Your workflow jobs.
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      # Check-out your repository.
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      # Login to Render Container Registry
-      - name: Login to Render
-        run: echo "${{ secrets.RENDER_API_KEY }}" | docker login registry.render.com -u render --password-stdin
-
-      # Build and Push Docker Image
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t registry.render.com/${{ secrets.RENDER_SERVICE_NAME }}/web:latest .
-          docker push registry.render.com/${{ secrets.RENDER_SERVICE_NAME }}/web:latest
-
-      # Deploy on Render
       - name: Deploy to Render
         run: |
           curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
